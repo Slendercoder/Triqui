@@ -3,9 +3,9 @@ from FNC import *
 from Codificacion import *
 import json
 
-Nfilas = 2
-Ncolumnas = 2
-Nnumeros = 2 # Se asume que E es 0, O es 1, X es 2
+Nfilas = 3
+Ncolumnas = 3
+Nnumeros = 3 # Se asume que E es 0, O es 1, X es 2
 Nturnos = 2
 
 class Tree(object):
@@ -75,15 +75,30 @@ def regla0():
                         regla += clausula + P(x, y, o, t, Nfilas, Ncolumnas, Nnumeros, Nturnos) + "=Y"
     return regla
 
-# Esta regla pone la restriccion de que solo se puede poner una O en el turno siguiente
-def regla3():
+# Esta regla pone la restriccion de que se preserva el X/O de un turno a otro
+def regla1():
     inicial = True
-    for x in range(Nfilas - 1):
-        for y in range(Ncolumnas - 1):
+    for x in range(Nfilas):
+        for y in range(Ncolumnas):
+            for o in range(1, Nnumeros):
+                if inicial:
+                    inicial = False
+                    regla = P(x, y, o, 1, Nfilas, Ncolumnas, Nnumeros, Nturnos) + P(x, y, o, 0, Nfilas, Ncolumnas, Nnumeros, Nturnos) + ">"
+                else:
+                    regla += P(x, y, o, 1, Nfilas, Ncolumnas, Nnumeros, Nturnos) + P(x, y, o, 0, Nfilas, Ncolumnas, Nnumeros, Nturnos) + ">Y"
+
+    return regla
+
+# Esta regla pone la restriccion de que solo se puede poner una O en el turno siguiente
+def regla2():
+    inicial_impl = True
+    for x in range(Nfilas):
+        for y in range(Ncolumnas):
             x_aux = [i for i in range(Nfilas) if i != x]
             y_aux = [i for i in range(Ncolumnas) if i != y]
-            inicial_impl = True
-            for z in range(Nnumeros):
+            inicial = True
+            otros_numeros = [i for i in range(Nnumeros) if i != 1]
+            for z in otros_numeros:
                 for xP in range(Nfilas):
                     for yP in range(Ncolumnas):
                         if (xP!=x) or (yP!=y):
@@ -108,15 +123,15 @@ def regla3():
     return impl
 
 # Esta regla pone la restriccion de que no puede haber ninguna X adicional
-def regla4():
+def regla3():
     pass
 
 # Esta regla pone la condicion inicial
-def regla5():
+def regla4():
 
     x0 = 1
     y0 = 1
-    letra = P(x0, y0, 1, 0, Nfilas, Ncolumnas, Nnumeros, Nturnos)
+    letra = P(x0, y0, 2, 0, Nfilas, Ncolumnas, Nnumeros, Nturnos)
     for x in range(Nfilas):
         for y in range(Ncolumnas):
             if (x!=x0) or (y!=y0):
@@ -167,9 +182,9 @@ def actualizar_dict(
 reglas = {}
 letrasProposicionalesA = [chr(x) for x in range(256, 400)]
 letrasB_inicial = 400
-rango = 300
+rango = 350
 
-reglas_seleccionadas = [0, 3, 5]
+reglas_seleccionadas = [0, 1, 2, 4]
 
 for r in reglas_seleccionadas:
     regla = actualizar_dict(r, letrasB_inicial, rango, letrasProposicionalesA)

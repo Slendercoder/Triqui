@@ -23,9 +23,9 @@ def calcular_resultado(formula):
 
     S, I = DPLL(formula, {})
 
-    Nfilas = 2
-    Ncolumnas = 2
-    Nnumeros = 2 # Se asume que E es 0, O es 1, X es 2
+    Nfilas = 3
+    Ncolumnas = 3
+    Nnumeros = 3 # Se asume que E es 0, O es 1, X es 2
     Nturnos = 2
 
     print(S)
