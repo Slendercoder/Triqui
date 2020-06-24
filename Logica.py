@@ -1,32 +1,47 @@
 import json
 from DPLL import *
 from Codificacion import *
+from FNC import *
 
-def cargar_reglas():
+Nfilas = 3
+Ncolumnas = 3
+Nnumeros = 3 # Se asume que E es 0, O es 1, X es 2
+Nturnos = 2
+
+
+def interpreta_tablero(tablero):
+    inicial = True
+    for l in tablero:
+        if inicial:
+            letra = P(*l, 0, Nfilas, Ncolumnas, Nnumeros, Nturnos)
+            inicial = False
+        else:
+            letra += P(*l, 0, Nfilas, Ncolumnas, Nnumeros, Nturnos) + "Y"
+
+    letra = formaClausal(letra)
+    return letra
+
+def cargar_reglas(tablero):
     # Cargando reglas
     with open('reglas.json', 'r') as file:
         reglas = json.load(file)
 
-    print("Trabajando con reglas", list(reglas.keys()))
+    # rw = list(reglas.keys())
+    # rw = ['regla0', 'regla1', 'regla3', 'regla4', 'regla5', 'regla2']
+    rw = []
+    print("Trabajando con reglas", rw)
 
-    inicial = True
-    for r in reglas.keys():
-        if inicial:
-            formula = reglas[r]
-            inicial = False
-        else:
-            formula += reglas[r]
+    formula = interpreta_tablero(tablero)
+    # formula = []
+
+    for r in rw:
+        formula += reglas[r]
 
     return formula
 
 def calcular_resultado(formula):
 
     S, I = DPLL(formula, {})
-
-    Nfilas = 3
-    Ncolumnas = 3
-    Nnumeros = 3 # Se asume que E es 0, O es 1, X es 2
-    Nturnos = 2
 
     print(S)
     # print(I)
@@ -47,5 +62,20 @@ def calcular_resultado(formula):
     imprime(resultado_turno0)
     imprime(resultado_turno1)
 
-formula = cargar_reglas()
-calcular_resultado(formula)
+# 0 0 0
+# 0 2 0
+# 0 1 1
+
+tablero = [
+[2, 2, 1],
+[2, 1, 1],
+[2, 0, 0],
+[1, 2, 0],
+[1, 0, 0],
+[0, 2, 0],
+[0, 0, 0],
+[0, 1, 0],
+[1, 1, 2]
+]
+formula = cargar_reglas(tablero)
+# calcular_resultado(formula)

@@ -124,20 +124,132 @@ def regla2():
 
 # Esta regla pone la restriccion de que no puede haber ninguna X adicional
 def regla3():
-    pass
+    inicial = True
+    for f in range(Nfilas):
+        for c in range(Ncolumnas):
+            if inicial:
+                inicial=False
+                reg = P(f, c, 2, 1, Nfilas, Ncolumnas, Nnumeros, Nturnos) + "-" + P(f, c, 0, 0, Nfilas, Ncolumnas, Nnumeros, Nturnos) + ">"
+            else:
+                reg += P(f, c, 2, 1, Nfilas, Ncolumnas, Nnumeros, Nturnos) + "-" + P(f, c, 0, 0, Nfilas, Ncolumnas, Nnumeros, Nturnos) + ">Y"
 
-# Esta regla pone la condicion inicial
+    return reg
+
 def regla4():
+    # Parte E: Evitar columna
+    inicial=True
+    columnas = range(Ncolumnas)
+    filas = range(Nfilas)
+    for c in columnas:
+        for f in filas:
+            inicial1 = True
+            alfas = [x for x in filas if x != f]
+            for a in alfas:
+                if inicial1:
+                    clau = P(a,c,2,0,Nfilas, Ncolumnas, Nnumeros, Nturnos)
+                    inicial1 = False
+                else:
+                     clau += P(a,c,2,0,Nfilas, Ncolumnas, Nnumeros, Nturnos) + 'Y'
+            if inicial:
+                E = P(f,c,1,1,Nfilas, Ncolumnas, Nnumeros, Nturnos) + clau + '>'
+                inicial = False
+            else:
+                E += P(f,c,1,1,Nfilas, Ncolumnas, Nnumeros, Nturnos) + clau + '>' + 'Y'
 
-    x0 = 1
-    y0 = 1
-    letra = P(x0, y0, 2, 0, Nfilas, Ncolumnas, Nnumeros, Nturnos)
-    for x in range(Nfilas):
-        for y in range(Ncolumnas):
-            if (x!=x0) or (y!=y0):
-                letra += P(x, y, 0, 0, Nfilas, Ncolumnas, Nnumeros, Nturnos) + "Y"
+    # Parte F: Evitar fila
+    inicial=True
+    F = ""
+    for f in filas:
+        for c in columnas:
+            inicial1 = True
+            for a in columnas:
+                if a != c and inicial1:
+                    F += P(f,a,2,0,Nfilas, Ncolumnas, Nnumeros, Nturnos)
+                    inicial1 = False
+                if a != c:
+                     F += P(f,a,2,0,Nfilas, Ncolumnas, Nnumeros, Nturnos) + 'Y'
+            if inicial:
+                F += P(f,c,1,1,Nfilas, Ncolumnas, Nnumeros, Nturnos) + '>'
+                inicial = False
+            else:
+                F += P(f,c,1,1,Nfilas, Ncolumnas, Nnumeros, Nturnos) + '>' + 'Y'
 
-    return letra
+    #Parte G: Evitar columna principal
+    inicial=True
+    G = ""
+    for a in columnas:
+        inicial1 = True
+        for b in columnas:
+            if a != b and inicial1:
+                G += P(b,b,2,0,Nfilas, Ncolumnas, Nnumeros, Nturnos)
+            if a != c:
+                G += P(b,b,2,0,Nfilas, Ncolumnas, Nnumeros, Nturnos) + 'Y'
+        if inicial:
+            G += P(a,a,1,1,Nfilas, Ncolumnas, Nnumeros, Nturnos) + '>'
+            inicial = False
+        else:
+            G += P(a,a,1,1,Nfilas, Ncolumnas, Nnumeros, Nturnos) + '>' + 'Y'
+
+    #Parte H: Evitar columna secundaria
+    inicial=True
+    H = ""
+    for a in columnas:
+        inicial1 = True
+        for b in columnas:
+            if a != b and inicial1:
+                H += P(b,2-b,2,0,Nfilas, Ncolumnas, Nnumeros, Nturnos)
+            if a != c:
+                H += P(b,2-b,2,0,Nfilas, Ncolumnas, Nnumeros, Nturnos) + 'Y'
+        if inicial:
+            H += P(a,2-a,1,1,Nfilas, Ncolumnas, Nnumeros, Nturnos) + '>'
+            inicial = False
+        else:
+            H += P(a,a,1,1,Nfilas, Ncolumnas, Nnumeros, Nturnos) + '>' + 'Y'
+
+    return E# + F + 'Y' + G + 'Y' + H + 'Y'
+
+def regla5():
+    # Parte A: Rellenar columna
+    inicial = True
+    for f in range(Nfilas):
+        for c in range(Ncolumnas):
+            if inicial:
+                A = P(f, (c+2)%3, 1, 1, Nfilas, Ncolumnas, Nnumeros, Nturnos) + P(f, c, 1, 0, Nfilas, Ncolumnas, Nnumeros, Nturnos) + P(f, (c+1)%3, 1, 0, Nfilas, Ncolumnas, Nnumeros, Nturnos) + 'Y' + '>'
+                inicial = False
+            else:
+                A += P(f, (c+2)%3, 1, 1, Nfilas, Ncolumnas, Nnumeros, Nturnos) + P(f, c, 1, 0, Nfilas, Ncolumnas, Nnumeros, Nturnos) + P(f, (c+1)%3, 1, 0, Nfilas, Ncolumnas, Nnumeros, Nturnos) + 'Y' + '>' + 'Y'
+
+    # Parte B: Rellenar fila
+    inicial = True
+    for f in range(Nfilas):
+        for c in range(Ncolumnas):
+            if inicial:
+                B = P((f+2)%3, c, 1, 1, Nfilas, Ncolumnas, Nnumeros, Nturnos) + P(f, c, 1, 0, Nfilas, Ncolumnas, Nnumeros, Nturnos) + P((f+1)%3, c, 1, 0, Nfilas, Ncolumnas, Nnumeros, Nturnos) + 'Y' + '>'
+                inicial = False
+            else:
+                B += P((f+2)%3, c, 1, 1, Nfilas, Ncolumnas, Nnumeros, Nturnos) + P(f, c, 1, 0, Nfilas, Ncolumnas, Nnumeros, Nturnos) + P((f+1)%3, c, 1, 0, Nfilas, Ncolumnas, Nnumeros, Nturnos) + 'Y' + '>' + 'Y'
+
+    # Parte C: Rellenar diagonal principal
+    inicial = True
+    for a in range(Nfilas):
+        if inicial:
+            C = P((a+2)%3, (a+2)%3, 1, 1, Nfilas, Ncolumnas, Nnumeros, Nturnos) + P((a+1)%3, (a+1)%3, 1, 0, Nfilas, Ncolumnas, Nnumeros, Nturnos) + P(a, a, 1, 0, Nfilas, Ncolumnas, Nnumeros, Nturnos) + 'Y' + '>'
+            inicial = False
+        else:
+            C += P((a+2)%3, (a+2)%3, 1, 1, Nfilas, Ncolumnas, Nnumeros, Nturnos) + P((a+1)%3, (a+1)%3, 1, 0, Nfilas, Ncolumnas, Nnumeros, Nturnos) + P(a, a, 1, 0, Nfilas, Ncolumnas, Nnumeros, Nturnos) + 'Y' + '>' + 'Y'
+
+    # Parte D: Rellenar diagonal secundaria
+    inicial = True
+    for f in range(Nfilas):
+        c = 2-f
+        if inicial:
+            D = P((f-2)%3, (c+2)%3, 1, 1, Nfilas, Ncolumnas, Nnumeros, Nturnos) + P((f-1)%3, (c+1)%3, 1, 0, Nfilas, Ncolumnas, Nnumeros, Nturnos) + P(f, c, 1, 0, Nfilas, Ncolumnas, Nnumeros, Nturnos) + 'Y' + '>'
+            inicial = False
+        else:
+            D += P((f-2)%3, (c+2)%3, 1, 1, Nfilas, Ncolumnas, Nnumeros, Nturnos) + P((f-1)%3, (c+1)%3, 1, 0, Nfilas, Ncolumnas, Nnumeros, Nturnos) + P(f, c, 1, 0, Nfilas, Ncolumnas, Nnumeros, Nturnos) + 'Y' + '>' + 'Y'
+
+    # Regla completa y solucion
+    return A + B + 'Y' + C + 'Y' + D + 'Y'
 
 def actualizar_dict(
         r:int,
@@ -184,7 +296,8 @@ letrasProposicionalesA = [chr(x) for x in range(256, 400)]
 letrasB_inicial = 400
 rango = 350
 
-reglas_seleccionadas = [0, 1, 2, 4]
+reglas_seleccionadas = [0, 1, 2, 3, 4, 5]
+# reglas_seleccionadas = [0, 1, 2]
 
 for r in reglas_seleccionadas:
     regla = actualizar_dict(r, letrasB_inicial, rango, letrasProposicionalesA)
